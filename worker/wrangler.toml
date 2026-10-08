@@ -1,0 +1,3 @@
+name = "sonline-orders"
+main = "telegram-order.js"
+compatibility_date = "2026-09-01"
