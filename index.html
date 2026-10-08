@@ -22,6 +22,7 @@
         <a href="#benefits">Переваги</a>
         <a href="#configurator">Розміри та ціни</a>
         <a href="#layers">Будова</a>
+        <a href="#springs">Пружини</a>
         <a href="#faq">Питання</a>
       </nav>
       <a href="tel:+380000000000" class="header__phone">+38 (000) 000-00-00</a>
@@ -47,31 +48,8 @@
             <li><strong>від 7 900 ₴</strong> ціна</li>
           </ul>
         </div>
-        <div class="hero__visual" aria-hidden="true">
-          <svg viewBox="0 0 520 360" class="mattress-svg">
-            <defs>
-              <linearGradient id="topG" x1="0" x2="1">
-                <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef3fb"/>
-              </linearGradient>
-              <linearGradient id="sideG" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stop-color="#dfe8f6"/><stop offset="1" stop-color="#c9d7ee"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="260" cy="300" rx="230" ry="26" fill="#0b2a5b" opacity=".08"/>
-            <path d="M60 170 L300 110 L480 170 L240 240 Z" fill="url(#topG)" stroke="#c9d7ee" stroke-width="2"/>
-            <path d="M60 170 L240 240 L240 290 L60 220 Z" fill="url(#sideG)"/>
-            <path d="M240 240 L480 170 L480 220 L240 290 Z" fill="#d4e0f2"/>
-            <g stroke="#b5c6e3" stroke-width="1.5" fill="none" opacity=".8">
-              <path d="M100 180 L320 122"/><path d="M140 190 L360 133"/><path d="M180 200 L400 145"/><path d="M220 212 L440 157"/>
-            </g>
-            <g fill="#2f6fde" opacity=".9">
-              <circle cx="90" cy="205" r="3"/><circle cx="120" cy="217" r="3"/><circle cx="150" cy="229" r="3"/><circle cx="180" cy="241" r="3"/><circle cx="210" cy="253" r="3"/>
-            </g>
-            <path d="M240 240 L240 290" stroke="#b5c6e3" stroke-width="2"/>
-            <rect x="330" y="40" rx="14" width="160" height="56" fill="#0b2a5b"/>
-            <text x="410" y="65" text-anchor="middle" fill="#fff" font-family="Manrope, sans-serif" font-size="13" font-weight="700">Азалія</text>
-            <text x="410" y="83" text-anchor="middle" fill="#9fc0ff" font-family="Manrope, sans-serif" font-size="11">висота 22 см</text>
-          </svg>
+        <div class="hero__visual">
+          <img src="assets/azalia-room.webp" width="800" height="800" alt="Матрац «Азалія» на ліжку в спальні" fetchpriority="high">
         </div>
       </div>
     </section>
@@ -161,15 +139,41 @@
     <!-- LAYERS -->
     <section class="section" id="layers">
       <div class="container layers">
+        <img class="layers__img" src="assets/azalia-layers.webp" width="800" height="800" loading="lazy" alt="Будова матраца «Азалія» в розрізі: шари наповнення та блок пружин">
         <div>
           <h2 class="section__title section__title--left">Що всередині</h2>
-          <p class="section__subtitle section__subtitle--left">Загальна висота матраца — 22 см. Кожен шар виконує свою роботу: разом вони рівномірно розподіляють навантаження.</p>
+          <p class="section__subtitle section__subtitle--left">Загальна висота — 22 см. Шари симетрично лежать навколо пружинного блоку і рівномірно розподіляють навантаження.</p>
+          <ol class="layer-list">
+            <li><span class="layer-list__swatch" style="--c:#f2f4f8"></span><div><b>Стьобаний чохол</b> — мʼяка поверхня, приємна на дотик</div></li>
+            <li><span class="layer-list__swatch" style="--c:#f3c9d9"></span><div><b>Піна</b> — комфортний шар, знімає тиск на плечі й стегна</div></li>
+            <li><span class="layer-list__swatch" style="--c:#a07a52"></span><div><b>Кокосове полотно</b> — додає пружності та жорсткості</div></li>
+            <li><span class="layer-list__swatch" style="--c:#6b6f76"></span><div><b>Термоповсть</b> — захищає наповнення від пружин</div></li>
+            <li><span class="layer-list__swatch" style="--c:linear-gradient(90deg,#6cc3f0 0 33%,#e6e05a 33% 66%,#fff 66%)"></span><div><b>Зональний блок незалежних пружин</b> — кожна пружина в окремому чохлі, різні зони під різні частини тіла</div></li>
+            <li><span class="layer-list__swatch" style="--c:#fff"></span><div><b>Пінний периметр</b> — тримає форму країв, край не просідає</div></li>
+          </ol>
         </div>
-        <ol class="layer-list">
-          <li><span class="layer-list__swatch" style="--c:#f6f8fc"></span><div><b>Чохол</b> — щільна тканина, приємна на дотик</div></li>
-          <li><span class="layer-list__swatch" style="--c:#cfe0ff"></span><div><b>Комфортні шари</b> — мʼяко розподіляють тиск на плечі та стегна</div></li>
-          <li><span class="layer-list__swatch" style="--c:#8fa7c9"></span><div><b>Ортопедична основа</b> — тримає хребет рівно, не продавлюється</div></li>
-        </ol>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="section section--tinted" id="springs">
+      <div class="container">
+        <h2 class="section__title">Пружинний блок зблизька</h2>
+        <p class="section__subtitle">Незалежні пружини працюють окремо одна від одної — партнер не відчуває, коли ви повертаєтесь уві сні.</p>
+        <div class="grid grid--3 gallery">
+          <figure>
+            <img src="assets/azalia-springs.webp" width="800" height="520" loading="lazy" alt="Незалежні пружини в окремих чохлах різних кольорів">
+            <figcaption>Кожна пружина — в окремому чохлі</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/azalia-frame.webp" width="756" height="567" loading="lazy" alt="Металевий каркас по периметру пружинного блоку">
+            <figcaption>Металевий каркас по периметру блоку</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/azalia-perimeter.webp" width="800" height="560" loading="lazy" alt="Зони пружин різної жорсткості, позначені кольором">
+            <figcaption>Зони різної жорсткості позначені кольором</figcaption>
+          </figure>
+        </div>
       </div>
     </section>
 
