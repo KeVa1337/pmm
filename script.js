@@ -2,174 +2,78 @@
   // Куди надсилати замовлення (POST JSON). Порожньо — лише показуємо підтвердження.
   const ORDER_ENDPOINT = "";
 
-  const DISCOUNT = 0.15;
-  const CUSTOM_MARKUP = 0.2;
+  const PRODUCT = { name: "Азалія", height: 22 };
 
-  const MODELS = [
-    { id: "comfort", name: "Comfort", height: 18, firmness: "Середньо-жорсткий", perM2: 3200 },
-    { id: "ortho", name: "Ortho Pro", height: 22, firmness: "Середній, 7 зон", perM2: 4600, tag: "Хіт" },
-    { id: "premium", name: "Premium Memory", height: 26, firmness: "М'який верх / жорстка база", perM2: 6200 },
-  ];
-
-  // Стандартні розміри «ширина × довжина»
+  // Розміри та ціни (грн)
   const SIZES = [
-    [70, 190], [80, 190], [80, 200], [90, 190], [90, 200],
-    [120, 190], [120, 200], [140, 190], [140, 200],
-    [160, 190], [160, 200], [180, 190], [180, 200], [200, 200],
+    { w: 140, l: 200, price: 7900 },
+    { w: 160, l: 200, price: 8865 },
+    { w: 180, l: 200, price: 10017 },
   ];
-  const WIDTHS = [...new Set(SIZES.map(([w]) => w))];
-  const LENGTHS = [...new Set(SIZES.map(([, l]) => l))];
-  const hasSize = (w, l) => SIZES.some(([sw, sl]) => sw === w && sl === l);
 
-  const state = { model: "ortho", width: 160, length: 200, custom: false, cw: 150, cl: 195, qty: 1 };
+  const state = { size: 1, qty: 1 };
 
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => n.toLocaleString("uk-UA").replace(/,/g, " ") + " ₴";
-  const roundTo = (n, step) => Math.round(n / step) * step;
+  const sizeLabel = ({ w, l }) => `${w} × ${l}`;
+  const sizeCategory = (w) => (w <= 90 ? "Односпальний" : w <= 140 ? "Півтораспальний" : "Двоспальний");
+  const currentSize = () => SIZES[state.size];
 
-  function fullPrice(model, w, l, custom) {
-    let p = model.perM2 * (w / 100) * (l / 100);
-    if (custom) p *= 1 + CUSTOM_MARKUP;
-    return roundTo(p, 10);
-  }
-  const salePrice = (full) => roundTo(full * (1 - DISCOUNT), 10) - 1;
-
-  function sizeCategory(w) {
-    if (w <= 90) return "Односпальний";
-    if (w <= 140) return "Півтораспальний";
-    return "Двоспальний";
-  }
-
-  const currentModel = () => MODELS.find((m) => m.id === state.model);
-  const currentSize = () => (state.custom ? [state.cw, state.cl] : [state.width, state.length]);
-
-  // ---------- Render controls ----------
-  function renderModels() {
-    $("models").innerHTML = MODELS.map((m) => `
+  // ---------- Render ----------
+  function renderSizes() {
+    $("sizes").innerHTML = SIZES.map((s, i) => `
       <label class="model">
-        <input type="radio" name="model" value="${m.id}" ${m.id === state.model ? "checked" : ""}>
-        ${m.tag ? `<span class="model__tag">${m.tag}</span>` : ""}
-        <span class="model__name">${m.name}</span>
-        <span class="model__meta">${m.height} см · ${m.firmness}</span>
-        <span class="model__from">від ${fmt(salePrice(fullPrice(m, 70, 190, false)))}</span>
+        <input type="radio" name="size" value="${i}" ${i === state.size ? "checked" : ""}>
+        ${s.tag ? `<span class="model__tag">${s.tag}</span>` : ""}
+        <span class="model__name">${sizeLabel(s)} см</span>
+        <span class="model__meta">${sizeCategory(s.w)}</span>
+        <span class="model__from">${fmt(s.price)}</span>
       </label>`).join("");
-  }
-
-  function renderChips(el, name, values, selected) {
-    el.innerHTML = values.map((v) => `
-      <label class="chip">
-        <input type="radio" name="${name}" value="${v}" ${v === selected ? "checked" : ""}>
-        <span>${v}</span>
-      </label>`).join("");
-  }
-
-  function syncLengthAvailability() {
-    document.querySelectorAll('input[name="length"]').forEach((inp) => {
-      const l = Number(inp.value);
-      inp.disabled = !hasSize(state.width, l);
-      inp.checked = l === state.length;
-    });
   }
 
   function renderTable() {
-    const head = `<thead><tr><th>Розмір, см</th>${MODELS.map((m) => `<th>${m.name}</th>`).join("")}</tr></thead>`;
-    const body = SIZES.map(([w, l]) => `
-      <tr data-w="${w}" data-l="${l}">
-        <td>${w} × ${l}</td>
-        ${MODELS.map((m) => `<td>${fmt(salePrice(fullPrice(m, w, l, false)))}</td>`).join("")}
-      </tr>`).join("");
-    $("priceTable").innerHTML = head + `<tbody>${body}</tbody>`;
+    $("priceTable").innerHTML = `
+      <thead><tr><th>Розмір, см</th><th>Висота</th><th>Ціна</th></tr></thead>
+      <tbody>${SIZES.map((s, i) => `
+        <tr data-i="${i}"><td>${sizeLabel(s)}</td><td>${PRODUCT.height} см</td><td>${fmt(s.price)}</td></tr>`).join("")}
+      </tbody>`;
   }
 
   // ---------- Summary ----------
   function update() {
-    const model = currentModel();
-    const [w, l] = currentSize();
-    const full = fullPrice(model, w, l, state.custom) * state.qty;
-    const sale = salePrice(fullPrice(model, w, l, state.custom)) * state.qty;
-
-    $("sumModel").textContent = model.name;
-    $("sumSize").textContent = `${w} × ${l} см${state.custom ? " (нестанд.)" : ""}`;
-    $("sumHeight").textContent = `${model.height} см`;
-    $("sumFirm").textContent = model.firmness;
+    const s = currentSize();
+    $("sumModel").textContent = PRODUCT.name;
+    $("sumSize").textContent = `${sizeLabel(s)} см`;
+    $("sumHeight").textContent = `${PRODUCT.height} см`;
+    $("sumStock").textContent = "В наявності";
     $("sumQty").textContent = state.qty;
     $("qty").textContent = state.qty;
-    $("priceOld").textContent = fmt(full);
-    $("price").textContent = fmt(sale);
+    $("price").textContent = fmt(s.price * state.qty);
 
-    // Превʼю: масштаб 200 см = 150 px по довжині
+    // Превʼю: пропорційний прямокутник
     const scale = 150 / 220;
     const bed = $("bedPreview");
-    bed.style.width = `${Math.round(w * scale)}px`;
-    bed.style.height = `${Math.round(l * scale * 0.85)}px`;
-    $("bedLabel").textContent = `${w} × ${l}`;
-    $("bedCaption").textContent = sizeCategory(w);
+    bed.style.width = `${Math.round(s.w * scale)}px`;
+    bed.style.height = `${Math.round(s.l * scale * 0.85)}px`;
+    $("bedLabel").textContent = sizeLabel(s);
+    $("bedCaption").textContent = sizeCategory(s.w);
+  }
 
-    $("widths").classList.toggle("is-off", state.custom);
-    $("lengths").classList.toggle("is-off", state.custom);
+  function selectSize(i) {
+    state.size = i;
+    document.querySelectorAll('input[name="size"]').forEach((inp) => { inp.checked = Number(inp.value) === i; });
+    update();
   }
 
   // ---------- Events ----------
   function bindConfigurator() {
-    $("models").addEventListener("change", (e) => {
-      state.model = e.target.value;
-      update();
-    });
-
-    $("widths").addEventListener("change", (e) => {
-      state.width = Number(e.target.value);
-      if (!hasSize(state.width, state.length)) {
-        state.length = LENGTHS.find((l) => hasSize(state.width, l));
-      }
-      syncLengthAvailability();
-      update();
-    });
-
-    $("lengths").addEventListener("change", (e) => {
-      state.length = Number(e.target.value);
-      update();
-    });
-
-    $("customToggle").addEventListener("change", (e) => {
-      state.custom = e.target.checked;
-      $("customSize").hidden = !state.custom;
-      update();
-    });
-
-    const clampInput = (inp, key) => {
-      const min = Number(inp.min), max = Number(inp.max);
-      const handler = (commit) => {
-        let v = Math.round(Number(inp.value));
-        if (!Number.isFinite(v)) return;
-        if (commit) {
-          v = Math.min(max, Math.max(min, v));
-          inp.value = v;
-        }
-        if (v >= min && v <= max) {
-          state[key] = v;
-          update();
-        }
-      };
-      inp.addEventListener("input", () => handler(false));
-      inp.addEventListener("change", () => handler(true));
-    };
-    clampInput($("customW"), "cw");
-    clampInput($("customL"), "cl");
-
+    $("sizes").addEventListener("change", (e) => selectSize(Number(e.target.value)));
     $("qtyMinus").addEventListener("click", () => { state.qty = Math.max(1, state.qty - 1); update(); });
     $("qtyPlus").addEventListener("click", () => { state.qty = Math.min(10, state.qty + 1); update(); });
-
     $("priceTable").addEventListener("click", (e) => {
-      const row = e.target.closest("tr[data-w]");
+      const row = e.target.closest("tr[data-i]");
       if (!row) return;
-      state.width = Number(row.dataset.w);
-      state.length = Number(row.dataset.l);
-      state.custom = false;
-      $("customToggle").checked = false;
-      $("customSize").hidden = true;
-      document.querySelectorAll('input[name="width"]').forEach((i) => { i.checked = Number(i.value) === state.width; });
-      syncLengthAvailability();
-      update();
+      selectSize(Number(row.dataset.i));
       $("configurator").scrollIntoView({ behavior: "smooth" });
     });
   }
@@ -183,9 +87,8 @@
     const close = () => modal.close();
 
     $("orderBtn").addEventListener("click", () => {
-      const [w, l] = currentSize();
       $("modalOrder").textContent =
-        `${currentModel().name}, ${w}×${l} см × ${state.qty} шт. — ${$("price").textContent}`;
+        `Матрац «${PRODUCT.name}», ${sizeLabel(currentSize())} см × ${state.qty} шт. — ${$("price").textContent}`;
       form.hidden = false;
       success.hidden = true;
       modal.showModal();
@@ -211,14 +114,15 @@
       }
       if (!ok) return;
 
-      const [w, l] = currentSize();
+      const { w, l, price } = currentSize();
       const order = {
         ...Object.fromEntries(new FormData(form)),
-        model: currentModel().name,
+        product: PRODUCT.name,
         width: w,
         length: l,
-        custom: state.custom,
+        height: PRODUCT.height,
         qty: state.qty,
+        price,
         total: $("price").textContent,
       };
 
@@ -261,10 +165,7 @@
     });
   }
 
-  renderModels();
-  renderChips($("widths"), "width", WIDTHS, state.width);
-  renderChips($("lengths"), "length", LENGTHS, state.length);
-  syncLengthAvailability();
+  renderSizes();
   renderTable();
   bindConfigurator();
   bindModal();
