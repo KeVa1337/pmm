@@ -35,7 +35,7 @@
     <section class="hero">
       <div class="container hero__inner">
         <div class="hero__text">
-          <span class="badge">В наявності: 140×200 · 160×200 · 180×200</span>
+          <span class="badge">Акція: від 15 000 ₴ · інші розміри під замовлення</span>
           <h1>Матрац «Азалія» — <br>ортопедичний сон у будь-яку пору року</h1>
           <p class="lead">Модель колекції Butterfly від фабрики Matroluxe. Пʼятизонний блок незалежних пружин підтримує кожну частину тіла, а дві різні сторони — зимова з натуральною вовною та літня — дарують комфорт цілий рік.</p>
           <div class="hero__actions">
@@ -98,13 +98,23 @@
     <section class="section section--tinted" id="configurator">
       <div class="container">
         <h2 class="section__title">Оберіть розмір «Азалії»</h2>
-        <p class="section__subtitle">Усі розміри в наявності на складі, відправляємо в день замовлення.</p>
+        <p class="section__subtitle">Акційні ціни на розміри 140×200, 160×200 та 180×200. Потрібен інший розмір? Виготовимо під замовлення за хорошою ціною.</p>
 
         <div class="configurator">
           <div class="configurator__options">
             <fieldset class="field">
               <legend>1. Розмір, см</legend>
               <div class="sizes" id="sizes"></div>
+              <div class="custom-size" id="customSize" hidden>
+                <label>Ширина, см
+                  <input type="number" id="customW" min="60" max="220" step="1" value="150" inputmode="numeric">
+                </label>
+                <span class="custom-size__x">×</span>
+                <label>Довжина, см
+                  <input type="number" id="customL" min="160" max="220" step="1" value="200" inputmode="numeric">
+                </label>
+                <p class="hint">Виготовимо матрац під ваше ліжко. Менеджер звʼяжеться, назве ціну та термін виготовлення.</p>
+              </div>
               <p class="hint">Як виміряти: внутрішній розмір рами ліжка без бортиків.</p>
             </fieldset>
 
@@ -131,10 +141,11 @@
               <div><dt>Кількість</dt><dd id="sumQty">1</dd></div>
             </dl>
             <div class="summary__price">
-                            <span class="price" id="price"></span>
+              <span class="price-label" id="priceLabel">Акційна ціна</span>
+              <span class="price" id="price"></span>
             </div>
             <button type="button" class="btn btn--primary btn--block" id="orderBtn">Замовити</button>
-            <p class="summary__note">Оплата при отриманні · Доставка 1–3 дні</p>
+            <p class="summary__note" id="summaryNote">Оплата при отриманні · Доставка 1–3 дні</p>
           </aside>
         </div>
 
@@ -214,7 +225,7 @@
         <dl class="specs">
           <div><dt>Виробник</dt><dd>Matroluxe, колекція Butterfly</dd></div>
           <div><dt>Висота</dt><dd>22 см</dd></div>
-          <div><dt>Розміри</dt><dd>140×200, 160×200, 180×200 см</dd></div>
+          <div><dt>Розміри</dt><dd>140×200, 160×200, 180×200 см; інші — під замовлення</dd></div>
           <div><dt>Пружинний блок</dt><dd>Pocket Spring, 5 зон</dd></div>
           <div><dt>Посилення блоку</dt><dd>Металеві рамки, кутова система, Butterfly</dd></div>
           <div><dt>Наповнення</dt><dd>Oxigen Foam, кокосова койра, Thermofiber</dd></div>
@@ -230,6 +241,7 @@
       <div class="container container--narrow">
         <h2 class="section__title">Часті питання</h2>
         <details class="faq"><summary>Як обрати розмір?</summary><p>Виміряйте внутрішній розмір рами ліжка (без бортиків). Матрац має бути такого ж розміру або на 1 см менший. 140×200 — для півтораспального ліжка, 160×200 та 180×200 — для двоспального.</p></details>
+        <details class="faq"><summary>Чи є інші розміри?</summary><p>Так. Окрім 140×200, 160×200 та 180×200, виготовимо матрац під замовлення в потрібному розмірі за хорошою ціною. Оберіть «Інший розмір» у калькуляторі або напишіть нам — менеджер розрахує вартість і термін.</p></details>
         <details class="faq"><summary>Чим відрізняються сторони матраца?</summary><p>Зимова сторона прошита натуральною вовною, яка зберігає тепло. Літня — прохолодніша та краще провітрюється. Сторони мають різну жорсткість, тож можна обрати ту, що зручніша саме вам.</p></details>
         <details class="faq"><summary>Що таке система Butterfly?</summary><p>Це посилення пружинного блоку, яке разом із металевими рамками та кутовою системою підтримки робить краї стійкими до деформації, а сам блок — міцнішим і витривалішим до високих навантажень.</p></details>
         <details class="faq"><summary>Яка гарантія?</summary><p>5 років гарантії від виробника Matroluxe.</p></details>

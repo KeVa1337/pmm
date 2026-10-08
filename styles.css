@@ -96,7 +96,9 @@ h1, h2, h3 { line-height: 1.15; margin: 0 0 .5em; }
 .field:last-child { margin-bottom: 0; }
 .field legend { font-weight: 800; margin-bottom: 12px; padding: 0; }
 
-.sizes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 10px; }
+.sizes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 10px; }
+.model--custom { border-style: dashed; }
+.model--custom .model__from { font-size: 15px; color: var(--accent); }
 .model {
   position: relative; display: block; cursor: pointer;
   border: 2px solid var(--line); border-radius: 14px; padding: 16px; transition: border-color .2s, background .2s;
@@ -158,9 +160,10 @@ input.is-invalid { border-color: #e04848; }
 .summary__list div { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
 .summary__list dt { color: var(--muted); }
 .summary__list dd { margin: 0; font-weight: 700; text-align: right; }
-.summary__price { display: flex; align-items: baseline; gap: 12px; padding-top: 14px; border-top: 1px dashed var(--line); margin-bottom: 16px; }
+.summary__price { display: grid; gap: 2px; padding-top: 14px; border-top: 1px dashed var(--line); margin-bottom: 16px; }
 .price { font-size: 32px; font-weight: 800; color: var(--navy); }
-.price-old { color: var(--muted); text-decoration: line-through; }
+.price-label { font-size: 13px; font-weight: 800; color: #c4471a; text-transform: uppercase; letter-spacing: .04em; }
+.price--request { font-size: 26px; }
 .summary__note { margin: 12px 0 0; font-size: 13px; color: var(--muted); text-align: center; }
 
 .size-table { margin-top: 28px; background: #fff; border-radius: var(--radius); padding: 18px 24px; box-shadow: var(--shadow); }
@@ -239,6 +242,7 @@ input.is-invalid { border-color: #e04848; }
 
 /* Responsive */
 @media (max-width: 1000px) {
+  .sizes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid--4 { grid-template-columns: repeat(2, 1fr); }
   .configurator { grid-template-columns: 1fr; }
   .summary { position: static; }
@@ -271,7 +275,7 @@ input.is-invalid { border-color: #e04848; }
   .section { padding: 56px 0; }
   .hero { padding-top: 32px; }
   .grid--4 { grid-template-columns: 1fr; }
-  .sizes { grid-template-columns: 1fr; }
+  .sizes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .configurator__options { padding: 20px; }
   .hero__facts { gap: 20px; }
 }

@@ -4,20 +4,22 @@
 
   const PRODUCT = { name: "Азалія", height: 22 };
 
-  // Розміри та ціни (грн)
+  // Розміри та акційні ціни (грн)
   const SIZES = [
-    { w: 140, l: 200, price: 7900 },
-    { w: 160, l: 200, price: 8865 },
-    { w: 180, l: 200, price: 10017 },
+    { w: 140, l: 200, price: 15000 },
+    { w: 160, l: 200, price: 17000 },
+    { w: 180, l: 200, price: 19000 },
   ];
+  const CUSTOM = "custom"; // інший розмір під замовлення, ціна за запитом
 
-  const state = { size: 1, qty: 1 };
+  const state = { size: 1, qty: 1, cw: 150, cl: 200 };
 
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => n.toLocaleString("uk-UA").replace(/,/g, " ") + " ₴";
   const sizeLabel = ({ w, l }) => `${w} × ${l}`;
   const sizeCategory = (w) => (w <= 90 ? "Односпальний" : w <= 140 ? "Півтораспальний" : "Двоспальний");
-  const currentSize = () => SIZES[state.size];
+  const isCustom = () => state.size === CUSTOM;
+  const currentSize = () => (isCustom() ? { w: state.cw, l: state.cl, price: null } : SIZES[state.size]);
 
   // ---------- Render ----------
   function renderSizes() {
@@ -28,7 +30,13 @@
         <span class="model__name">${sizeLabel(s)} см</span>
         <span class="model__meta">${sizeCategory(s.w)}</span>
         <span class="model__from">${fmt(s.price)}</span>
-      </label>`).join("");
+      </label>`).join("") + `
+      <label class="model model--custom">
+        <input type="radio" name="size" value="${CUSTOM}" ${isCustom() ? "checked" : ""}>
+        <span class="model__name">Інший розмір</span>
+        <span class="model__meta">Під замовлення</span>
+        <span class="model__from">Вигідна ціна</span>
+      </label>`;
   }
 
   function renderTable() {
@@ -42,27 +50,53 @@
   // ---------- Summary ----------
   function update() {
     const s = currentSize();
+    const custom = isCustom();
     $("sumModel").textContent = PRODUCT.name;
     $("sumSize").textContent = `${sizeLabel(s)} см`;
     $("sumHeight").textContent = `${PRODUCT.height} см`;
-    $("sumStock").textContent = "В наявності";
+    $("sumStock").textContent = custom ? "Під замовлення" : "В наявності";
     $("sumQty").textContent = state.qty;
     $("qty").textContent = state.qty;
-    $("price").textContent = fmt(s.price * state.qty);
+    $("price").textContent = custom ? "За запитом" : fmt(s.price * state.qty);
+    $("price").classList.toggle("price--request", custom);
+    $("priceLabel").textContent = custom ? "Менеджер розрахує вигідну ціну" : "Акційна ціна";
+    $("orderBtn").textContent = custom ? "Дізнатися ціну" : "Замовити";
+    $("customSize").hidden = !custom;
+    $("summaryNote").textContent = custom
+      ? "Термін виготовлення уточнить менеджер"
+      : "Оплата при отриманні · Доставка 1–3 дні";
 
     $("bedLabel").textContent = `${sizeLabel(s)} см`;
-    $("bedCaption").textContent = sizeCategory(s.w);
+    $("bedCaption").textContent = custom ? "Під замовлення" : sizeCategory(s.w);
   }
 
   function selectSize(i) {
     state.size = i;
-    document.querySelectorAll('input[name="size"]').forEach((inp) => { inp.checked = Number(inp.value) === i; });
+    document.querySelectorAll('input[name="size"]').forEach((inp) => { inp.checked = inp.value === String(i); });
     update();
   }
 
   // ---------- Events ----------
   function bindConfigurator() {
-    $("sizes").addEventListener("change", (e) => selectSize(Number(e.target.value)));
+    $("sizes").addEventListener("change", (e) => {
+      const v = e.target.value;
+      selectSize(v === CUSTOM ? CUSTOM : Number(v));
+    });
+
+    for (const [id, key] of [["customW", "cw"], ["customL", "cl"]]) {
+      const inp = $(id);
+      const min = Number(inp.min), max = Number(inp.max);
+      inp.addEventListener("input", () => {
+        const v = Math.round(Number(inp.value));
+        if (v >= min && v <= max) { state[key] = v; update(); }
+      });
+      inp.addEventListener("change", () => {
+        const v = Math.min(max, Math.max(min, Math.round(Number(inp.value)) || state[key]));
+        inp.value = v;
+        state[key] = v;
+        update();
+      });
+    }
     $("qtyMinus").addEventListener("click", () => { state.qty = Math.max(1, state.qty - 1); update(); });
     $("qtyPlus").addEventListener("click", () => { state.qty = Math.min(10, state.qty + 1); update(); });
     $("priceTable").addEventListener("click", (e) => {
@@ -82,8 +116,9 @@
     const close = () => modal.close();
 
     $("orderBtn").addEventListener("click", () => {
+      const note = isCustom() ? "під замовлення, ціна за запитом" : $("price").textContent;
       $("modalOrder").textContent =
-        `Матрац «${PRODUCT.name}», ${sizeLabel(currentSize())} см × ${state.qty} шт. — ${$("price").textContent}`;
+        `Матрац «${PRODUCT.name}», ${sizeLabel(currentSize())} см × ${state.qty} шт. — ${note}`;
       form.hidden = false;
       success.hidden = true;
       modal.showModal();
@@ -116,6 +151,7 @@
         width: w,
         length: l,
         height: PRODUCT.height,
+        customSize: isCustom(),
         qty: state.qty,
         price,
         total: $("price").textContent,
