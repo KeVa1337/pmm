@@ -2,6 +2,7 @@
 //   POST /               — приймає замовлення і пересилає в Telegram
 //   POST /np/cities      — пошук міста в Новій пошті      { q }
 //   POST /np/warehouses  — відділення Нової пошти у місті { cityRef }
+//   GET  /np/cities?q=Київ — те саме для перевірки в браузері
 // Змінні (Settings → Variables and Secrets): BOT_TOKEN (Secret), CHAT_ID.
 // Необовʼязково: NP_API_KEY (Secret) — ключ API Нової пошти; ALLOWED_ORIGIN — адреса сайту.
 
@@ -46,9 +47,9 @@ async function np(env, modelName, calledMethod, methodProperties) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ apiKey: env.NP_API_KEY || "", modelName, calledMethod, methodProperties }),
   });
-  if (!res.ok) throw new Error(`np ${res.status}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
-  if (!data.success) throw new Error(`np ${(data.errors || []).join("; ")}`);
+  if (!data.success) throw new Error((data.errors || []).join("; ") || "np error");
   return data.data || [];
 }
 
@@ -87,6 +88,17 @@ export default {
     const path = new URL(request.url).pathname.replace(/\/+$/, "");
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
+
+    // Перевірка довідника Нової пошти в браузері: /np/cities?q=Київ
+    if (request.method === "GET" && path === "/np/cities") {
+      try {
+        const items = await searchCities(env, new URL(request.url).searchParams.get("q"));
+        return json({ ok: true, version: 2, items }, 200, headers);
+      } catch (e) {
+        return json({ ok: false, version: 2, error: "novaposhta", detail: String(e.message || e) }, 502, headers);
+      }
+    }
+
     if (request.method !== "POST") return json({ ok: false, error: "method" }, 405, headers);
     if (env.ALLOWED_ORIGIN && origin !== env.ALLOWED_ORIGIN) return json({ ok: false, error: "origin" }, 403, headers);
 
@@ -101,8 +113,8 @@ export default {
       try {
         const items = path === "/np/cities" ? await searchCities(env, body.q) : await listWarehouses(env, body.cityRef);
         return json({ ok: true, items }, 200, { ...headers, "Cache-Control": "public, max-age=3600" });
-      } catch {
-        return json({ ok: false, error: "novaposhta" }, 502, headers);
+      } catch (e) {
+        return json({ ok: false, error: "novaposhta", detail: String(e.message || e) }, 502, headers);
       }
     }
 
