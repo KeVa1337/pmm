@@ -50,12 +50,7 @@
     $("qty").textContent = state.qty;
     $("price").textContent = fmt(s.price * state.qty);
 
-    // Превʼю: пропорційний прямокутник
-    const scale = 150 / 220;
-    const bed = $("bedPreview");
-    bed.style.width = `${Math.round(s.w * scale)}px`;
-    bed.style.height = `${Math.round(s.l * scale * 0.85)}px`;
-    $("bedLabel").textContent = sizeLabel(s);
+    $("bedLabel").textContent = `${sizeLabel(s)} см`;
     $("bedCaption").textContent = sizeCategory(s.w);
   }
 
