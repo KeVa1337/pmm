@@ -237,6 +237,19 @@ input.is-invalid { border-color: #e04848; }
 .modal__note { margin: 0; text-align: center; font-size: 13px; color: var(--muted); }
 .modal__close { position: absolute; top: 10px; right: 14px; border: 0; background: none; font-size: 28px; cursor: pointer; color: var(--muted); }
 .modal__check { width: 64px; height: 64px; border-radius: 50%; background: #e3f6ea; color: #1f9d55; font-size: 32px; display: grid; place-items: center; font-weight: 800; }
+.np { border: 0; padding: 0; margin: 0; display: grid; gap: 14px; min-width: 0; }
+.np legend { font-weight: 800; font-size: 15px; padding: 0; margin-bottom: 10px; }
+.combo { position: relative; display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+.combo input:disabled { background: var(--tint); cursor: not-allowed; }
+.combo__list {
+  position: absolute; z-index: 5; top: calc(100% - 2px); left: 0; right: 0;
+  max-height: 240px; overflow-y: auto; margin: 0; padding: 4px; list-style: none;
+  background: #fff; border: 2px solid var(--blue); border-radius: 10px; box-shadow: var(--shadow);
+}
+.combo__list li { padding: 9px 10px; border-radius: 6px; cursor: pointer; font-weight: 500; line-height: 1.35; }
+.combo__list li[aria-selected="true"], .combo__list li:hover { background: #eaf1ff; }
+.combo__list li.is-empty { color: var(--muted); cursor: default; background: none; }
+.combo__note { font-size: 12px; color: var(--muted); font-weight: 500; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .error { display: none; color: #e04848; font-size: 13px; font-weight: 600; }
 .error.is-shown { display: block; }

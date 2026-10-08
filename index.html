@@ -271,9 +271,24 @@
         <input name="phone" type="tel" required autocomplete="tel" placeholder="+380 __ ___ __ __">
         <span class="error" data-for="phone">Вкажіть коректний номер</span>
       </label>
-      <label>Місто
-        <input name="city" autocomplete="address-level2" placeholder="Наприклад, Київ">
-      </label>
+      <fieldset class="np">
+        <legend>Доставка Новою поштою</legend>
+        <div class="combo">
+          <label for="npCity">Місто</label>
+          <input id="npCity" name="city" autocomplete="off" placeholder="Почніть вводити назву міста"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="npCityList">
+          <ul class="combo__list" id="npCityList" role="listbox" hidden></ul>
+          <span class="error" data-for="city">Оберіть місто зі списку</span>
+        </div>
+        <div class="combo">
+          <label for="npWh">Відділення</label>
+          <input id="npWh" name="warehouse" autocomplete="off" placeholder="Спочатку оберіть місто" disabled
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="npWhList">
+          <ul class="combo__list" id="npWhList" role="listbox" hidden></ul>
+          <span class="error" data-for="warehouse">Оберіть відділення зі списку</span>
+          <span class="combo__note" id="npWhNote"></span>
+        </div>
+      </fieldset>
       <label>Коментар
         <textarea name="comment" rows="2" placeholder="Зручний час дзвінка, побажання"></textarea>
       </label>

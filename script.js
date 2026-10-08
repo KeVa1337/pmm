@@ -108,6 +108,164 @@
     });
   }
 
+  // ---------- Nova Poshta ----------
+  const NP_ENDPOINT = ORDER_ENDPOINT ? ORDER_ENDPOINT.replace(/\/+$/, "") + "/np" : "";
+  const np = { cityRef: "", warehouseRef: "", warehouses: [], failed: !NP_ENDPOINT };
+
+  async function npRequest(path, body) {
+    const res = await fetch(`${NP_ENDPOINT}/${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || res.statusText);
+    return data.items;
+  }
+
+  // Матрац везуть пласким: довжина × ширина × висота
+  const parcelDims = () => { const { w, l } = currentSize(); return [l, w, PRODUCT.height]; };
+  function fitsDims(maxDims, parcel) {
+    if (!maxDims || maxDims.every((d) => !d)) return true; // обмежень немає
+    const lim = [...maxDims].sort((a, b) => b - a);
+    const box = [...parcel].sort((a, b) => b - a);
+    return box.every((d, i) => !lim[i] || d <= lim[i]);
+  }
+
+  function combo(input, list, { load, render, onPick }) {
+    let items = [];
+    let active = -1;
+    let timer;
+    let seq = 0;
+
+    const close = () => { list.hidden = true; input.setAttribute("aria-expanded", "false"); active = -1; };
+    const highlight = (i) => {
+      active = i;
+      [...list.children].forEach((li, k) => li.setAttribute("aria-selected", String(k === i)));
+      list.children[i]?.scrollIntoView({ block: "nearest" });
+    };
+    const show = (arr, emptyText) => {
+      items = arr;
+      list.innerHTML = arr.length
+        ? arr.map((it, i) => `<li role="option" id="${list.id}-${i}" data-i="${i}">${render(it)}</li>`).join("")
+        : `<li class="is-empty">${emptyText}</li>`;
+      list.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      active = -1;
+    };
+    const pick = (i) => { if (items[i]) { onPick(items[i]); close(); } };
+
+    const run = () => {
+      const my = ++seq;
+      Promise.resolve(load(input.value.trim()))
+        .then((res) => { if (my === seq && res) show(res.items, res.empty); })
+        .catch(() => { if (my === seq) close(); });
+    };
+
+    input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(run, 250); });
+    input.addEventListener("focus", run);
+    input.addEventListener("keydown", (e) => {
+      if (list.hidden) return;
+      if (e.key === "ArrowDown") { e.preventDefault(); highlight(Math.min(items.length - 1, active + 1)); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); highlight(Math.max(0, active - 1)); }
+      else if (e.key === "Enter" && active >= 0) { e.preventDefault(); pick(active); }
+      else if (e.key === "Escape") { e.preventDefault(); close(); }
+    });
+    list.addEventListener("mousedown", (e) => {
+      const li = e.target.closest("li[data-i]");
+      if (li) { e.preventDefault(); pick(Number(li.dataset.i)); }
+    });
+    input.addEventListener("blur", () => setTimeout(close, 100));
+  }
+
+  function clearError(input) {
+    input.classList.remove("is-invalid");
+    input.form?.querySelector(`.error[data-for="${input.name}"]`)?.classList.remove("is-shown");
+  }
+
+  const escapeHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  function bindNovaPoshta() {
+    const city = $("npCity");
+    const wh = $("npWh");
+    const note = $("npWhNote");
+
+    const fallbackToText = () => {
+      np.failed = true;
+      wh.disabled = false;
+      wh.placeholder = "Номер або адреса відділення";
+      note.textContent = "Довідник Нової пошти тимчасово недоступний — впишіть місто й відділення вручну.";
+    };
+    if (np.failed) fallbackToText();
+
+    combo(city, $("npCityList"), {
+      load: async (q) => {
+        if (np.failed || q.length < 2) return null;
+        try {
+          return { items: await npRequest("cities", { q }), empty: "Місто не знайдено" };
+        } catch {
+          fallbackToText();
+          return null;
+        }
+      },
+      render: (c) => escapeHtml(c.name),
+      onPick: async (c) => {
+        city.value = c.name;
+        clearError(city);
+        np.cityRef = c.ref;
+        np.warehouseRef = "";
+        wh.value = "";
+        wh.disabled = true;
+        wh.placeholder = "Завантаження відділень…";
+        note.textContent = "";
+        try {
+          np.warehouses = await npRequest("warehouses", { cityRef: c.ref });
+          wh.disabled = false;
+          wh.placeholder = "Номер або вулиця відділення";
+        } catch {
+          fallbackToText();
+        }
+      },
+    });
+    city.addEventListener("input", () => {
+      if (np.failed) return;
+      np.cityRef = "";
+      np.warehouseRef = "";
+      wh.value = "";
+      wh.disabled = true;
+      wh.placeholder = "Спочатку оберіть місто";
+    });
+
+    combo(wh, $("npWhList"), {
+      load: (q) => {
+        if (np.failed || !np.cityRef) return null;
+        const parcel = parcelDims();
+        const fitting = np.warehouses.filter((w) => fitsDims(w.maxDims, parcel));
+        const pool = fitting.length ? fitting : np.warehouses;
+        note.textContent = fitting.length && fitting.length < np.warehouses.length
+          ? "Показано відділення, що приймають матрац такого розміру."
+          : "";
+        const needle = q.toLowerCase();
+        const items = pool.filter((w) => !needle || w.name.toLowerCase().includes(needle) || String(w.number) === needle);
+        return { items: items.slice(0, 100), empty: "Відділення не знайдено" };
+      },
+      render: (w) => escapeHtml(w.name),
+      onPick: (w) => { wh.value = w.name; np.warehouseRef = w.ref; clearError(wh); },
+    });
+    wh.addEventListener("input", () => { if (!np.failed) np.warehouseRef = ""; });
+  }
+
+  function resetNovaPoshta() {
+    np.cityRef = "";
+    np.warehouseRef = "";
+    np.warehouses = [];
+    if (!np.failed) {
+      $("npWh").disabled = true;
+      $("npWh").placeholder = "Спочатку оберіть місто";
+      $("npWhNote").textContent = "";
+    }
+  }
+
   // ---------- Order modal ----------
   function bindModal() {
     const modal = $("orderModal");
@@ -128,9 +286,16 @@
     $("successClose").addEventListener("click", close);
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
 
+    // Помилка зникає, щойно поле редагують (крім полів НП — там лише після вибору зі списку)
+    form.addEventListener("input", (e) => {
+      if (e.target.name === "name" || e.target.name === "phone") clearError(e.target);
+    });
+
     const validators = {
       name: (v) => v.trim().length >= 2,
       phone: (v) => /^\+?3?8?0\d{9}$/.test(v.replace(/[\s()\-]/g, "")),
+      city: (v) => (np.failed ? v.trim().length >= 2 : Boolean(np.cityRef)),
+      warehouse: (v) => (np.failed ? v.trim().length >= 1 : Boolean(np.warehouseRef)),
     };
 
     form.addEventListener("submit", async (e) => {
@@ -156,6 +321,8 @@
         qty: state.qty,
         price,
         total: $("price").textContent,
+        cityRef: np.cityRef,
+        warehouseRef: np.warehouseRef,
       };
 
       const submitBtn = form.querySelector('[type="submit"]');
@@ -172,6 +339,7 @@
           console.info("Замовлення:", order);
         }
         form.reset();
+        resetNovaPoshta();
         form.hidden = true;
         success.hidden = false;
       } catch (err) {
@@ -201,6 +369,7 @@
   renderTable();
   bindConfigurator();
   bindModal();
+  bindNovaPoshta();
   bindNav();
   update();
   $("year").textContent = new Date().getFullYear();
