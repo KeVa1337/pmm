@@ -1,7 +1,7 @@
 (() => {
   // Адреса Cloudflare Worker, що пересилає замовлення в Telegram (див. worker/README.md).
   // Порожньо — замовлення нікуди не надсилаються, лише виводяться в консоль.
-  const ORDER_ENDPOINT = "";
+  const ORDER_ENDPOINT = "https://sonline-orders.bogit49.workers.dev";
 
   const PRODUCT = { name: "Азалія", height: 22 };
 
