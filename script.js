@@ -3,17 +3,16 @@
   // Порожньо — замовлення нікуди не надсилаються, лише виводяться в консоль.
   const ORDER_ENDPOINT = "https://sonline-orders.bogit49.workers.dev";
 
-  const PRODUCT = { name: "Азалія", height: 22 };
+  const PRODUCT = { name: "Камелія", height: 22 };
 
-  // Розміри та акційні ціни (грн)
+  // Розміри в наявності та ціни (грн)
   const SIZES = [
-    { w: 140, l: 200, price: 15000 },
-    { w: 160, l: 200, price: 17000 },
-    { w: 180, l: 200, price: 19000 },
+    { w: 160, l: 200, price: 24153 },
+    { w: 180, l: 200, price: 26552 },
   ];
   const CUSTOM = "custom"; // інший розмір під замовлення, ціна за запитом
 
-  const state = { size: 1, qty: 1, cw: 150, cl: 200 };
+  const state = { size: 0, qty: 1, cw: 150, cl: 200 };
 
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => n.toLocaleString("uk-UA").replace(/,/g, " ") + " ₴";
@@ -60,7 +59,7 @@
     $("qty").textContent = state.qty;
     $("price").textContent = custom ? "За запитом" : fmt(s.price * state.qty);
     $("price").classList.toggle("price--request", custom);
-    $("priceLabel").textContent = custom ? "Менеджер розрахує вигідну ціну" : "Акційна ціна";
+    $("priceLabel").textContent = custom ? "Менеджер розрахує вигідну ціну" : "Ціна";
     $("orderBtn").textContent = custom ? "Дізнатися ціну" : "Замовити";
     $("customSize").hidden = !custom;
     $("summaryNote").textContent = custom
