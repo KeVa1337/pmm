@@ -5,10 +5,10 @@
 
   const PRODUCT = { name: "Камелія", height: 22 };
 
-  // Розміри в наявності та ціни (грн)
+  // Розміри в наявності та ціни (грн). factoryPrice — ціна на сайті виробника matroluxe.com
   const SIZES = [
-    { w: 160, l: 200, price: 22153 },
-    { w: 180, l: 200, price: 24552 },
+    { w: 160, l: 200, price: 21990, factoryPrice: 24153 },
+    { w: 180, l: 200, price: 23990, factoryPrice: 26552 },
   ];
   const CUSTOM = "custom"; // інший розмір під замовлення, ціна за запитом
 
@@ -29,6 +29,7 @@
         ${s.tag ? `<span class="model__tag">${s.tag}</span>` : ""}
         <span class="model__name">${sizeLabel(s)} см</span>
         <span class="model__meta">${sizeCategory(s.w)}</span>
+        <span class="model__old">${fmt(s.factoryPrice)}</span>
         <span class="model__from">${fmt(s.price)}</span>
       </label>`).join("") + `
       <label class="model model--custom">
@@ -41,9 +42,9 @@
 
   function renderTable() {
     $("priceTable").innerHTML = `
-      <thead><tr><th>Розмір, см</th><th>Висота</th><th>Ціна</th></tr></thead>
+      <thead><tr><th>Розмір, см</th><th>Висота</th><th>Ціна виробника</th><th>Наша ціна</th></tr></thead>
       <tbody>${SIZES.map((s, i) => `
-        <tr data-i="${i}"><td>${sizeLabel(s)}</td><td>${PRODUCT.height} см</td><td>${fmt(s.price)}</td></tr>`).join("")}
+        <tr data-i="${i}"><td>${sizeLabel(s)}</td><td>${PRODUCT.height} см</td><td><s>${fmt(s.factoryPrice)}</s></td><td><b>${fmt(s.price)}</b></td></tr>`).join("")}
       </tbody>`;
   }
 
@@ -59,7 +60,10 @@
     $("qty").textContent = state.qty;
     $("price").textContent = custom ? "За запитом" : fmt(s.price * state.qty);
     $("price").classList.toggle("price--request", custom);
-    $("priceLabel").textContent = custom ? "Менеджер розрахує вигідну ціну" : "Ціна";
+    $("priceLabel").textContent = custom
+      ? "Менеджер розрахує вигідну ціну"
+      : `Дешевше, ніж у виробника, на ${fmt((s.factoryPrice - s.price) * state.qty)}`;
+    $("priceOld").textContent = custom ? "" : fmt(s.factoryPrice * state.qty);
     $("orderBtn").textContent = custom ? "Дізнатися ціну" : "Замовити";
     $("customSize").hidden = !custom;
     $("summaryNote").textContent = custom

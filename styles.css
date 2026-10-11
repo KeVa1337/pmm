@@ -97,6 +97,8 @@ h1, h2, h3 { line-height: 1.15; margin: 0 0 .5em; }
 .field legend { font-weight: 800; margin-bottom: 12px; padding: 0; }
 
 .sizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 10px; }
+.model__old { display: block; margin-top: 8px; font-size: 13px; color: var(--muted); text-decoration: line-through; }
+.model__old + .model__from { margin-top: 0; }
 .model--custom { border-style: dashed; }
 .model--custom .model__from { font-size: 15px; color: var(--accent); }
 .model {
@@ -162,7 +164,9 @@ input.is-invalid { border-color: #e04848; }
 .summary__list dd { margin: 0; font-weight: 700; text-align: right; }
 .summary__price { display: grid; gap: 2px; padding-top: 14px; border-top: 1px dashed var(--line); margin-bottom: 16px; }
 .price { font-size: 32px; font-weight: 800; color: var(--navy); }
-.price-label { font-size: 13px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.price-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.price-old { color: var(--muted); font-size: 17px; }
+.price-label { font-size: 13px; font-weight: 800; color: #1f9d55; text-transform: uppercase; letter-spacing: .04em; }
 .price--request { font-size: 26px; }
 .summary__note { margin: 12px 0 0; font-size: 13px; color: var(--muted); text-align: center; }
 
