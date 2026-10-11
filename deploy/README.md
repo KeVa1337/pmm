@@ -7,3 +7,6 @@
 ```
 zip -r deploy/site.zip index.html styles.css script.js assets
 ```
+Після змін у styles.css чи script.js змініть `?v=...` в index.html, щоб браузери не брали старі файли з кешу.
+```
+```
