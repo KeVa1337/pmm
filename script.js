@@ -6,8 +6,8 @@
   // Google Ads / Analytics (див. docs/google-ads.md). Порожні значення — теги не завантажуються.
   const GOOGLE = {
     ga4Id: "G-5VYQWM2DN0", // Google Analytics 4
-    adsId: "",          // AW-XXXXXXXXXX
-    adsLeadLabel: "",   // мітка конверсії «Замовлення»
+    adsId: "AW-18248564723", // Google Ads
+    adsLeadLabel: "1T_0CM-ywZkdEPP_y_1D", // конверсія «Замовлення матраца SonLine»
     adsContactLabel: "",// мітка конверсії «Дзвінок / Telegram» (необовʼязково)
   };
 
