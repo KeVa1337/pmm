@@ -346,7 +346,7 @@
         form.hidden = true;
         success.hidden = false;
       } catch (err) {
-        alert("Не вдалося надіслати замовлення. Спробуйте ще раз або зателефонуйте нам.");
+        alert("Не вдалося надіслати замовлення. Спробуйте ще раз або звʼяжіться з нами: +380 63 664 06 06, Telegram @neonix_u.");
       } finally {
         submitBtn.disabled = false;
       }

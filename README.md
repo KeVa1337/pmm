@@ -14,4 +14,4 @@
 - `SIZES` — розміри та ціни.
 - `ORDER_ENDPOINT` — адреса воркера, що пересилає замовлення в Telegram. Налаштування: [`worker/README.md`](worker/README.md). Зараз: `https://sonline-orders.bogit49.workers.dev`.
 
-Телефон `+38 (000) 000-00-00` — заглушка, замініть на свій номер або посилання на Telegram.
+Контакти: +380 63 664 06 06, Telegram @neonix_u.
