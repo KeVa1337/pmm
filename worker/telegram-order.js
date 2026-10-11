@@ -38,6 +38,11 @@ export function formatOrder(o) {
   if (o.city) lines.push(`🏙 ${escapeHtml(o.city)}`);
   if (o.warehouse) lines.push(`🚚 Нова пошта: ${escapeHtml(o.warehouse)}`);
   if (o.comment) lines.push(`💬 ${escapeHtml(o.comment)}`);
+  const src = o.source && typeof o.source === "object" ? o.source : {};
+  const utm = [src.utm_source, src.utm_medium, src.utm_campaign, src.utm_term].filter(Boolean).map(escapeHtml);
+  if (utm.length || src.gclid) {
+    lines.push("", `📈 Джерело: ${utm.length ? utm.join(" / ") : "Google Ads"}${src.gclid ? " (gclid)" : ""}`);
+  }
   return lines.join("\n");
 }
 

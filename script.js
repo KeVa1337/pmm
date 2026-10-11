@@ -3,6 +3,14 @@
   // Порожньо — замовлення нікуди не надсилаються, лише виводяться в консоль.
   const ORDER_ENDPOINT = "https://sonline-orders.bogit49.workers.dev";
 
+  // Google Ads / Analytics (див. docs/google-ads.md). Порожні значення — теги не завантажуються.
+  const GOOGLE = {
+    ga4Id: "",          // G-XXXXXXXXXX
+    adsId: "",          // AW-XXXXXXXXXX
+    adsLeadLabel: "",   // мітка конверсії «Замовлення»
+    adsContactLabel: "",// мітка конверсії «Дзвінок / Telegram» (необовʼязково)
+  };
+
   const PRODUCT = { name: "Камелія", height: 22 };
 
   // Розміри в наявності та ціни (грн). factoryPrice — ціна на сайті виробника matroluxe.com
@@ -13,6 +21,12 @@
   const CUSTOM = "custom"; // інший розмір під замовлення, ціна за запитом
 
   const state = { size: 0, qty: 1, cw: 150, cl: 200 };
+  // Розмір з посилання, напр. ?size=180x200 (для реклами та Google Merchant)
+  {
+    const m = /^(\d{2,3})x(\d{3})$/.exec(new URLSearchParams(location.search).get("size") || "");
+    const i = m ? SIZES.findIndex((s) => s.w === Number(m[1]) && s.l === Number(m[2])) : -1;
+    if (i >= 0) state.size = i;
+  }
 
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => n.toLocaleString("uk-UA").replace(/,/g, " ") + " ₴";
@@ -109,6 +123,71 @@
       selectSize(Number(row.dataset.i));
       $("configurator").scrollIntoView({ behavior: "smooth" });
     });
+  }
+
+  // ---------- Analytics ----------
+  const gtagReady = Boolean(GOOGLE.ga4Id || GOOGLE.adsId);
+  function gtag() { window.dataLayer.push(arguments); }
+  function initAnalytics() {
+    if (!gtagReady) return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = gtag;
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE.adsId || GOOGLE.ga4Id}`;
+    document.head.appendChild(s);
+    gtag("js", new Date());
+    if (GOOGLE.ga4Id) gtag("config", GOOGLE.ga4Id);
+    if (GOOGLE.adsId) gtag("config", GOOGLE.adsId, { allow_enhanced_conversions: true });
+  }
+  function track(event, params = {}) {
+    if (gtagReady) gtag("event", event, params);
+  }
+
+  // Звідки прийшов покупець: utm-мітки та gclid з реклами (зберігаємо на час візиту)
+  const SOURCE_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid"];
+  function captureSource() {
+    const params = new URLSearchParams(location.search);
+    const found = {};
+    SOURCE_KEYS.forEach((k) => { if (params.get(k)) found[k] = params.get(k).slice(0, 150); });
+    try {
+      if (Object.keys(found).length) sessionStorage.setItem("source", JSON.stringify(found));
+      return JSON.parse(sessionStorage.getItem("source") || "{}");
+    } catch {
+      return found;
+    }
+  }
+  const SOURCE = captureSource();
+
+  function toE164(phone) {
+    const d = phone.replace(/\D/g, "");
+    if (d.length === 12 && d.startsWith("380")) return "+" + d;
+    if (d.length === 10 && d.startsWith("0")) return "+38" + d;
+    return "";
+  }
+
+  function bindContactTracking() {
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href^='tel:'], a[href*='t.me/']");
+      if (!a) return;
+      const method = a.href.startsWith("tel:") ? "phone" : "telegram";
+      track("contact", { method });
+      if (GOOGLE.adsId && GOOGLE.adsContactLabel) {
+        track("conversion", { send_to: `${GOOGLE.adsId}/${GOOGLE.adsContactLabel}` });
+      }
+    });
+  }
+
+  function bindStickyCta() {
+    const bar = $("stickyCta");
+    if (!bar || !("IntersectionObserver" in window)) return;
+    const hidden = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => (en.isIntersecting ? hidden.add(en.target) : hidden.delete(en.target)));
+      bar.classList.toggle("is-visible", hidden.size === 0);
+    });
+    [document.querySelector(".hero__actions"), $("configurator"), document.querySelector(".footer")]
+      .filter(Boolean).forEach((el) => io.observe(el));
   }
 
   // ---------- Nova Poshta ----------
@@ -284,6 +363,7 @@
       form.hidden = false;
       success.hidden = true;
       modal.showModal();
+      track("begin_checkout", { currency: "UAH", value: isCustom() ? 0 : currentSize().price * state.qty });
     });
     $("modalClose").addEventListener("click", close);
     $("successClose").addEventListener("click", close);
@@ -326,6 +406,7 @@
         total: $("price").textContent,
         cityRef: np.cityRef,
         warehouseRef: np.warehouseRef,
+        source: SOURCE,
       };
 
       const submitBtn = form.querySelector('[type="submit"]');
@@ -340,6 +421,21 @@
           if (!res.ok) throw new Error(res.statusText);
         } else {
           console.info("Замовлення:", order);
+        }
+        const value = price ? price * state.qty : 0;
+        const orderId = `${Date.now()}`;
+        if (gtagReady) {
+          const e164 = toE164(order.phone || "");
+          if (e164) gtag("set", "user_data", { phone_number: e164 });
+          track("generate_lead", { currency: "UAH", value });
+          if (GOOGLE.adsId && GOOGLE.adsLeadLabel) {
+            track("conversion", {
+              send_to: `${GOOGLE.adsId}/${GOOGLE.adsLeadLabel}`,
+              value,
+              currency: "UAH",
+              transaction_id: orderId,
+            });
+          }
         }
         form.reset();
         resetNovaPoshta();
@@ -371,8 +467,11 @@
   renderSizes();
   renderTable();
   bindConfigurator();
+  initAnalytics();
   bindModal();
   bindNovaPoshta();
+  bindContactTracking();
+  bindStickyCta();
   bindNav();
   update();
   $("year").textContent = new Date().getFullYear();

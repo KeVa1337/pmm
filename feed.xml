@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>SonLine</title>
+    <link>https://sonline.lumex-ua.com/</link>
+    <description>Матрац «Камелія» двосторонній</description>
+    <item>
+      <g:id>camelia-160x200</g:id>
+      <g:title>Матрац ортопедичний Matroluxe Camelia (Камелія) двосторонній 160x200 см</g:title>
+      <g:description>Двосторонній ортопедичний матрац колекції Butterfly. Блок незалежних пружин Pocket Spring 5 зон з посиленням, Oxigen Foam, Thermofiber, опція зима-літо (бавовна / шерсть). Висота 22 см, жорсткість 3/3. Гарантія виробника 5 років.</g:description>
+      <g:link>https://sonline.lumex-ua.com/?size=160x200</g:link>
+      <g:image_link>https://sonline.lumex-ua.com/assets/camelia-room.webp</g:image_link>
+      <g:additional_image_link>https://sonline.lumex-ua.com/assets/camelia-layers.webp</g:additional_image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>21990.00 UAH</g:price>
+      <g:brand>Matroluxe</g:brand>
+      <g:condition>new</g:condition>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:item_group_id>camelia</g:item_group_id>
+      <g:size>160x200</g:size>
+      <g:google_product_category>Furniture &gt; Beds &amp; Accessories &gt; Mattresses</g:google_product_category>
+    </item>
+    <item>
+      <g:id>camelia-180x200</g:id>
+      <g:title>Матрац ортопедичний Matroluxe Camelia (Камелія) двосторонній 180x200 см</g:title>
+      <g:description>Двосторонній ортопедичний матрац колекції Butterfly. Блок незалежних пружин Pocket Spring 5 зон з посиленням, Oxigen Foam, Thermofiber, опція зима-літо (бавовна / шерсть). Висота 22 см, жорсткість 3/3. Гарантія виробника 5 років.</g:description>
+      <g:link>https://sonline.lumex-ua.com/?size=180x200</g:link>
+      <g:image_link>https://sonline.lumex-ua.com/assets/camelia-room.webp</g:image_link>
+      <g:additional_image_link>https://sonline.lumex-ua.com/assets/camelia-layers.webp</g:additional_image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>23990.00 UAH</g:price>
+      <g:brand>Matroluxe</g:brand>
+      <g:condition>new</g:condition>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:item_group_id>camelia</g:item_group_id>
+      <g:size>180x200</g:size>
+      <g:google_product_category>Furniture &gt; Beds &amp; Accessories &gt; Mattresses</g:google_product_category>
+    </item>
+  </channel>
+</rss>

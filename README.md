@@ -15,3 +15,8 @@
 - `ORDER_ENDPOINT` — адреса воркера, що пересилає замовлення в Telegram. Налаштування: [`worker/README.md`](worker/README.md). Зараз: `https://sonline-orders.bogit49.workers.dev`.
 
 Контакти: +380 63 664 06 06, Telegram @neonix_u.
+
+## Реклама
+- Google Analytics / Ads: ID вписуються в `GOOGLE` у `script.js`. Інструкція й готові оголошення: [`docs/google-ads.md`](docs/google-ads.md).
+- `feed.xml` — фід товарів для Google Merchant Center, `robots.txt`, `sitemap.xml`, `privacy.html` — політика конфіденційності.
+- Посилання `?size=180x200` відкриває сторінку з вибраним розміром.
